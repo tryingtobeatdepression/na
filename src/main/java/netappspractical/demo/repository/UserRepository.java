@@ -1,8 +1,10 @@
 package netappspractical.demo.repository;
 
-import netappspractical.demo.domain.User;
+import netappspractical.demo.domain._User;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends CrudRepository<User, Integer> {
-
+@Repository
+public interface UserRepository extends CrudRepository<_User, Integer> {
+    public _User findByEmail(String email);
 }

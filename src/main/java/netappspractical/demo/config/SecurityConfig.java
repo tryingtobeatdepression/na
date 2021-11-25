@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-//
+
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
 
@@ -35,11 +35,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        System.out.println("configureGlobal");
         auth
                 .userDetailsService(jwtUserDetailsService)
                 .passwordEncoder(passwordEncoder());
-        //
     }
 
 
@@ -70,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 // Do not authenticate these particular requests
                 .authorizeRequests()
-                    .antMatchers("/auth")
+                    .antMatchers("/auth", "/users/create")
                     .permitAll()
                 // Any other request will be authenticated
                 .anyRequest()

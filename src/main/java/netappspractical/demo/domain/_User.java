@@ -1,15 +1,13 @@
 package netappspractical.demo.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
-public class User {
+@Table(name = "users")
+public class _User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private int id = 4;
     private String name;
     private String email;
     private String password;

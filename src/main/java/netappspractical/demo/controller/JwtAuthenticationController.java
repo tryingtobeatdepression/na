@@ -45,8 +45,8 @@ public class JwtAuthenticationController {
     @PostMapping("/auth")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authReq)
             throws Exception {
-        authenticate(authReq.getUsername(), authReq.getPassword());
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authReq.getUsername());
+        authenticate(authReq.getEmail(), authReq.getPassword());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authReq.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
     }
@@ -60,6 +60,7 @@ public class JwtAuthenticationController {
      */
     private void authenticate(String username, String password)
             throws Exception {
+
         try {
             // UsernamePasswordAuthenticationToken: An Authentication implementation that is
             // designed for simple representation of a username and password.

@@ -1,6 +1,7 @@
 package netappspractical.demo.config;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import netappspractical.demo.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,16 +24,17 @@ import java.io.IOException;
  * (Modularizing Code) **
  * ** Can be used to transform the response from a servlet or a JSP page.
  * (i.e. JSON) **
- *
+ * <p>
  * How it works:
  * A filter chain, passed to a filter by the container,
  * provides a mechanism for invoking a series of filters.
  * A filter config contains initialization data.
- *
+ * <p>
  * DoFilter:
- *  ** Customizes req/res.
- *  ** Invokes the next entity in the filter chain.
+ * ** Customizes req/res.
+ * ** Invokes the next entity in the filter chain.
  *
+ * TODO: Catch malformed jwt exception.
  */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -53,9 +55,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String requestTokenHeader = request.getHeader(authHeader);
         String username = null, jwtToken = null;
 
-        // JWT Token is in the form "Bearer token". Remove Bearer word and get
-        // only the Token
-        // TODO: this might not work!
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
@@ -72,10 +71,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Validate token and get user credentials
         // If no authentication exists && username exists
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null ) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
             // If the token is valid, configure Spring Security to manually set authentication.
-            if(this.jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+            if (this.jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 upat.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
