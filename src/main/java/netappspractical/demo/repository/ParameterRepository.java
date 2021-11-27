@@ -1,10 +1,9 @@
 package netappspractical.demo.repository;
 
-import netappspractical.demo.domain.Estate;
+import netappspractical.demo.domain.Parameter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EstateRepository extends JpaRepository<Estate, Integer> {
-
+public interface ParameterRepository extends JpaRepository<Parameter, Integer> {
 }

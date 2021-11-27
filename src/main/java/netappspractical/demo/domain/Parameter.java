@@ -6,17 +6,16 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "parameters")
-public class Parameters {
+public class Parameter {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String pKey;
-    private String pValue;
+    private Double pValue;
 
-    public Parameters() {}
+    public Parameter() {}
 
-    public Parameters(int id, String pKey, String pValue) {
-        this.id = id;
+    public Parameter(String pKey, Double pValue) {
         this.pKey = pKey;
         this.pValue = pValue;
     }
@@ -29,19 +28,19 @@ public class Parameters {
         this.id = id;
     }
 
-    public String getpKey() {
+    public String getPKey() {
         return pKey;
     }
 
-    public void setpKey(String pKey) {
+    public void setPKey(String pKey) {
         this.pKey = pKey;
     }
 
-    public String getpValue() {
+    public Double getPValue() {
         return pValue;
     }
 
-    public void setpValue(String pValue) {
+    public void setPValue(Double pValue) {
         this.pValue = pValue;
     }
 }

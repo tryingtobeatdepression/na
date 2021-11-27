@@ -24,13 +24,6 @@ public class UserController {
         return "index";
     }
 
-    @GetMapping("/reg")
-    public ModelAndView displayRegForm(WebRequest req, Model model) {
-        UserDto userDto = new UserDto();
-        model.addAttribute("user", userDto);
-        return new ModelAndView("reg");
-    }
-
     @PostMapping("/create")
     public @ResponseBody String create(@RequestBody UserDto userDto) {
         _User user = new _User();

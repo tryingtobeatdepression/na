@@ -1,12 +1,15 @@
 package netappspractical.demo.controller;
 
-import netappspractical.demo.domain.Estates;
+import netappspractical.demo.domain.Estate;
 import netappspractical.demo.dto.EstateDto;
 import netappspractical.demo.repository.EstateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/estates")
@@ -14,11 +17,6 @@ public class EstateController {
 
     @Autowired
     private EstateRepository estateRepository;
-
-    @GetMapping
-    public @ResponseBody String index() {
-        return "This is Estate home page.";
-    }
 
     /**
      * Create a new Estate entity on post request.
@@ -28,7 +26,7 @@ public class EstateController {
      */
     @PostMapping("/create")
     public @ResponseBody String create(@RequestBody EstateDto estateDto) {
-        Estates estate = new Estates();
+        Estate estate = new Estate();
         setEstateValues(estate, estateDto);
         this.estateRepository.save(estate);
         return "Estate created.";
@@ -49,10 +47,29 @@ public class EstateController {
     @PutMapping("/{id}")
     public @ResponseBody String edit(@PathVariable int id, @RequestBody EstateDto estateDto)
             throws IllegalAccessException, NoSuchFieldException {
-        Estates estate = this.estateRepository.getById(id);
+        Estate estate = this.estateRepository.getById(id);
         setEstateValues(estate, estateDto);
         this.estateRepository.save(estate);
         return "Estate information has been edited.";
+    }
+
+    /**
+     * Index page can be provided with a query to find the estate by name.
+     *
+     * @param query
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity<?> index(@RequestParam(required = false) String query) {
+        if(query != null) {
+            List<Estate> estates = new ArrayList<>();
+            for (Estate estate : this.estateRepository.findAll()) {
+                if (estate.getName().toUpperCase().contains(query.toUpperCase()))
+                    estates.add(estate);
+            }
+            return ResponseEntity.ok(estates);
+        }
+        return ResponseEntity.ok("No records found.");
     }
 
     /**
@@ -61,7 +78,7 @@ public class EstateController {
      * @param estate
      * @param dto
      */
-    private void setEstateValues(Estates estate, EstateDto dto) {
+    private void setEstateValues(Estate estate, EstateDto dto) {
         if(dto.getName() != null)
             estate.setName(dto.getName());
         if(dto.getDateOfSelling() != null)
@@ -73,6 +90,4 @@ public class EstateController {
         if(dto.getShareCount() != null)
             estate.setShareCount(dto.getShareCount());
     }
-
-
 }
