@@ -11,7 +11,7 @@ public class Estates {
     private int id;
     private String name;
     private Double price;
-    private int shareCount;
+    private Integer shareCount;
     private Date dateOfSelling;
     private String buyerName;
 
@@ -39,11 +39,11 @@ public class Estates {
         this.price = price;
     }
 
-    public int getShareCount() {
+    public Integer getShareCount() {
         return shareCount;
     }
 
-    public void setShareCount(int shareCount) {
+    public void setShareCount(Integer shareCount) {
         this.shareCount = shareCount;
     }
 

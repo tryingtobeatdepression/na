@@ -68,7 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 // Do not authenticate these particular requests
                 .authorizeRequests()
-                    .antMatchers("/auth", "/users/create", "/estates/**")
+                    .antMatchers("/auth",
+                            "/users/create",
+                            "/estates/**"
+                    )
                     .permitAll()
                 // Any other request will be authenticated
                 .anyRequest()

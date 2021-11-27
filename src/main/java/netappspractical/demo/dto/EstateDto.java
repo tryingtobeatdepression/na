@@ -5,7 +5,7 @@ import java.util.Date;
 public class EstateDto {
     private String name;
     private Double price;
-    private int shareCount = 5;
+    private Integer shareCount = 5;
     private String buyerName;
     private Date dateOfSelling;
 
@@ -25,11 +25,11 @@ public class EstateDto {
         this.price = price;
     }
 
-    public int getShareCount() {
+    public Integer getShareCount() {
         return shareCount;
     }
 
-    public void setShareCount(int shareCount) {
+    public void setShareCount(Integer shareCount) {
         this.shareCount = shareCount;
     }
 
