@@ -3,6 +3,7 @@ package netappspractical.demo.controller;
 import netappspractical.demo.domain.Estate;
 import netappspractical.demo.dto.EstateDto;
 import netappspractical.demo.repository.EstateRepository;
+import netappspractical.demo.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,16 @@ public class EstateController {
         return "Estate deleted.";
     }
 
+
+    /**
+     * Edit Estate info.
+     *
+     * @param id
+     * @param estateDto
+     * @return
+     * @throws IllegalAccessException
+     * @throws NoSuchFieldException
+     */
     @PutMapping("/{id}")
     public @ResponseBody String edit(@PathVariable int id, @RequestBody EstateDto estateDto)
             throws IllegalAccessException, NoSuchFieldException {
@@ -69,7 +80,22 @@ public class EstateController {
             }
             return ResponseEntity.ok(estates);
         }
-        return ResponseEntity.ok("No records found.");
+        return ResponseEntity.ok(Strings.NO_DATA_FOUND);
+    }
+
+    /**
+     * Get unsold Estates.
+     *
+     * @return
+     */
+    @GetMapping("/unsold")
+    public ResponseEntity<?> getUnsold() {
+        List<Estate> estates = new ArrayList<>();
+        for(Estate estate: this.estateRepository.findAll())
+            if(estate.getDateOfSelling() == null)
+                estates.add(estate);
+        return estates != null ? ResponseEntity.ok(estates):
+                ResponseEntity.ok(Strings.NO_DATA_FOUND);
     }
 
     /**
