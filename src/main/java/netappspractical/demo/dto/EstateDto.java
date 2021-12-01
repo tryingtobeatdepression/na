@@ -8,6 +8,11 @@ public class EstateDto {
     private Integer shareCount = 5;
     private String buyerName;
     private Date dateOfSelling;
+    private Long version = 1l;
+
+    public Long getVersion() {
+        return version;
+    }
 
     public String getName() {
         return name;

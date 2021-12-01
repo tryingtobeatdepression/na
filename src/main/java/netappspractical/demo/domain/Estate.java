@@ -1,5 +1,7 @@
 package netappspractical.demo.domain;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -14,6 +16,17 @@ public class Estate {
     private Integer shareCount;
     private Date dateOfSelling;
     private String buyerName;
+
+    @Version
+    private Long version;
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 
     public int getId() {
         return id;
