@@ -11,10 +11,11 @@ import java.util.List;
 @Repository
 public interface EstateRepository extends JpaRepository<Estate, Integer> {
     /**
-     * Lock data fetching with a Pessimistic Lock so that no one can edit
-     * the data being requested.
+     * Lock with a Pessimistic Lock so that no one can edit the data being requested.
+     *
      * @return
      */
     @Lock(LockModeType.PESSIMISTIC_READ)
+    @Override
     public List<Estate> findAll();
 }

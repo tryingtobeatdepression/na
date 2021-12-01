@@ -3,6 +3,7 @@ package netappspractical.demo.controller;
 import netappspractical.demo.domain.Estate;
 import netappspractical.demo.dto.EstateDto;
 import netappspractical.demo.repository.EstateRepository;
+import netappspractical.demo.repository.ParameterRepository;
 import netappspractical.demo.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/estates")
@@ -20,6 +22,9 @@ public class EstateController {
 
     @Autowired
     private EstateRepository estateRepository;
+
+    @Autowired
+    private ParameterRepository parameterRepository;
 
     /**
      * Create a new Estate entity on post request.
@@ -58,14 +63,22 @@ public class EstateController {
      * @param estateDto
      * @return
      */
+    @Transactional
     @PutMapping("/{id}")
     public @ResponseBody
-    String edit(@PathVariable int id, @RequestBody EstateDto estateDto) {
-        Optional<Estate> estate = this.estateRepository.findById(id);
-        setEstateValues(estate.get(), estateDto);
-        // We must not update or increment the "version" attribute.
-        // Only the persistence provider can do that, so data stays consistent.
-        this.estateRepository.save(estate.get());
+    String update(@PathVariable int id, @RequestBody EstateDto estateDto) {
+        try {
+            Optional<Estate> estate = this.estateRepository.findById(id);
+            setEstateValues(estate.get(), estateDto);
+            // We must not update or increment the "version" attribute.
+            // Only the persistence provider can do that, so data stays consistent.
+            wait(1000);
+            this.estateRepository.save(estate.get());
+        } catch (Exception e) {
+            System.out.println("Someone is trying to update the same record.\n" +
+                    "Please try again later.");
+            return "Failed!";
+        }
         return "Estate information has been edited.";
     }
 
@@ -76,14 +89,21 @@ public class EstateController {
      * @param dto
      * @return
      */
+    @Transactional
     @PutMapping("/sell/{id}")
     public @ResponseBody
     String sellEstate(@PathVariable int id, @RequestBody EstateDto dto) {
-        Optional<Estate> estate = this.estateRepository.findById(id);
-        sell(estate.get(), dto);
-        // We must not update or increment the "version" attribute.
-        // Only the persistence provider can do that, so data stays consistent.
-        this.estateRepository.save(estate.get());
+        try {
+            Optional<Estate> estate = this.estateRepository.findById(id);
+            sell(estate.get(), dto);
+            // We must not update or increment the "version" attribute.
+            // Only the persistence provider can do that, so data stays consistent.
+            this.estateRepository.save(estate.get());
+        } catch (Exception e) {
+            System.out.println("Someone is trying to update the same record.\n" +
+                    "Please try again later.");
+            return "Failed!";
+        }
         return "Estate has been sold.";
     }
 
@@ -95,7 +115,7 @@ public class EstateController {
      */
     @GetMapping
     public ResponseEntity<?> index(@RequestParam(required = false) String query) {
-        if(this.estateRepository.findAll().isEmpty())
+        if (this.estateRepository.findAll().isEmpty())
             return ResponseEntity.ok(Strings.NO_DATA_FOUND);
         List<Estate> estates = new ArrayList<>();
         if (query != null) {
@@ -132,8 +152,14 @@ public class EstateController {
     private void setEstateValues(Estate estate, EstateDto dto) {
         if (dto.getName() != null)
             estate.setName(dto.getName());
-        if (dto.getPrice() != null)
-            estate.setPrice(dto.getPrice());
+        if (dto.getPrice() != null) {
+            // Default price
+            Double profitPercentage = this.parameterRepository.
+                    findBypKey("profitPercentage").get().getPValue();
+            Double defaultPrice = (profitPercentage * dto.getPrice()) +
+                    dto.getPrice();
+            estate.setPrice(defaultPrice);
+        }
         if (dto.getShareCount() != null)
             estate.setShareCount(dto.getShareCount());
     }
