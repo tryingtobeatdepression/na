@@ -20,6 +20,67 @@ public class Estate {
     @Version
     private Long version;
 
+    @Column(nullable = true, length = 40)
+    private String addedBy;
+
+    @Column(nullable = true, length = 40)
+    private String modifiedBy;
+
+    @Column(nullable = true, length = 40)
+    private String createdAt;
+
+    @Column(nullable = true, length = 40)
+    private String updatedAt;
+
+    @Column(nullable = true, length = 40)
+    private Boolean sold;
+
+//    @ManyToOne()
+//    @JoinColumn(name = "owner_id", nullable = true)
+//    private _User owner;
+
+
+
+    public String getAddedBy() {
+        return addedBy;
+    }
+
+    public void setAddedBy(String addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getSold() {
+        return sold;
+    }
+
+    public void setSold(Boolean sold) {
+        this.sold = sold;
+    }
+
     public Long getVersion() {
         return version;
     }

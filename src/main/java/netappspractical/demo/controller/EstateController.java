@@ -5,17 +5,20 @@ import netappspractical.demo.dto.EstateDto;
 import netappspractical.demo.repository.EstateRepository;
 import netappspractical.demo.repository.ParameterRepository;
 import netappspractical.demo.util.Strings;
+import netappspractical.demo.util.Utility;
+import org.apache.tomcat.util.json.JSONParser;
+import org.codehaus.jettison.json.JSONStringer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
-import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+@Transactional
 @RestController
 @RequestMapping("/estates")
 public class EstateController {
@@ -49,10 +52,9 @@ public class EstateController {
      * @return
      */
     @DeleteMapping("/{id}")
-    public @ResponseBody
-    String delete(@PathVariable int id) {
+    public ResponseEntity<?> delete(@PathVariable int id) {
         this.estateRepository.deleteById(id);
-        return "Estate deleted.";
+        return ResponseEntity.ok("Estate deleted.");
     }
 
 
@@ -63,23 +65,18 @@ public class EstateController {
      * @param estateDto
      * @return
      */
-    @Transactional
     @PutMapping("/{id}")
-    public @ResponseBody
-    String update(@PathVariable int id, @RequestBody EstateDto estateDto) {
+    public ResponseEntity<?> update(@PathVariable int id, @RequestBody EstateDto estateDto) {
         try {
             Optional<Estate> estate = this.estateRepository.findById(id);
             setEstateValues(estate.get(), estateDto);
             // We must not update or increment the "version" attribute.
             // Only the persistence provider can do that, so data stays consistent.
-            wait(1000);
             this.estateRepository.save(estate.get());
         } catch (Exception e) {
-            System.out.println("Someone is trying to update the same record.\n" +
-                    "Please try again later.");
-            return "Failed!";
+            return ResponseEntity.internalServerError().body("Failed!");
         }
-        return "Estate information has been edited.";
+        return ResponseEntity.ok("Estate information has been edited.");
     }
 
     /**
@@ -89,58 +86,48 @@ public class EstateController {
      * @param dto
      * @return
      */
-    @Transactional
     @PutMapping("/sell/{id}")
-    public @ResponseBody
-    String sellEstate(@PathVariable int id, @RequestBody EstateDto dto) {
+    public ResponseEntity<?> sellEstate(@PathVariable int id, @RequestBody EstateDto dto) {
         try {
             Optional<Estate> estate = this.estateRepository.findById(id);
+            // Get buyerName, sellingDate
             sell(estate.get(), dto);
             // We must not update or increment the "version" attribute.
             // Only the persistence provider can do that, so data stays consistent.
             this.estateRepository.save(estate.get());
         } catch (Exception e) {
-            System.out.println("Someone is trying to update the same record.\n" +
-                    "Please try again later.");
-            return "Failed!";
+            return ResponseEntity.internalServerError().body("Failed!");
         }
-        return "Estate has been sold.";
+        return ResponseEntity.ok("Estate has been sold.");
     }
 
     /**
      * Index page can be provided with a query to find the estate by name.
-     *
+     * TESTED ✅
      * @param query
      * @return
      */
     @GetMapping
     public ResponseEntity<?> index(@RequestParam(required = false) String query) {
-        if (this.estateRepository.findAll().isEmpty())
-            return ResponseEntity.ok(Strings.NO_DATA_FOUND);
-        List<Estate> estates = new ArrayList<>();
-        if (query != null) {
-            for (Estate estate : this.estateRepository.findAll()) {
-                if (estate.getName().toUpperCase().contains(query.toUpperCase()))
-                    estates.add(estate);
-            }
-        } else
-            estates = this.estateRepository.findAll();
-        return ResponseEntity.ok(estates);
+        List<Estate> list = this.estateRepository.findAll()
+                    .stream()
+                    .filter(Utility.query(query))
+                    .collect(Collectors.toList());
+        return ResponseEntity.ok(list.isEmpty() ? Strings.NO_DATA_FOUND : list);
     }
 
     /**
      * Get unsold Estates.
-     *
+     * TESTED ✅
      * @return
      */
     @GetMapping("/unsold")
     public ResponseEntity<?> getUnsold() {
-        List<Estate> estates = new ArrayList<>();
-        for (Estate estate : this.estateRepository.findAll())
-            if (estate.getDateOfSelling() == null)
-                estates.add(estate);
-        return estates != null ? ResponseEntity.ok(estates) :
-                ResponseEntity.ok(Strings.NO_DATA_FOUND);
+        List<Estate> list = this.estateRepository.findAll()
+                .stream()
+                .filter(Utility.unsoldEstates)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(list.isEmpty() ? Strings.NO_DATA_FOUND : list);
     }
 
     /**
@@ -150,6 +137,7 @@ public class EstateController {
      * @param dto
      */
     private void setEstateValues(Estate estate, EstateDto dto) {
+        estate.setSold(false);
         if (dto.getName() != null)
             estate.setName(dto.getName());
         if (dto.getPrice() != null) {
@@ -171,6 +159,7 @@ public class EstateController {
      * @param dto
      */
     private void sell(Estate estate, EstateDto dto) {
+        estate.setSold(true);
         if (dto.getBuyerName() != null)
             estate.setBuyerName(dto.getBuyerName());
         if (dto.getDateOfSelling() != null)
