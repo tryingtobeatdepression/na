@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
  * the username and password.
  * If credentials are valid, jwt is created using JwtTokenUtil
  * and provided to the client
- *
  */
 @RestController
 @CrossOrigin()
@@ -42,9 +41,12 @@ public class JwtAuthenticationController {
      * @return
      * @throws Exception
      */
-    @PostMapping("/auth")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authReq)
+    @PostMapping(name = "/auth",
+            produces = {"application/json", "application/xml"},
+            consumes = {"multipart/form-data"})
+    public ResponseEntity<?> createAuthenticationToken(JwtRequest authReq)
             throws Exception {
+        System.out.println("Yo this is /auth !!");
         authenticate(authReq.getEmail(), authReq.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authReq.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);

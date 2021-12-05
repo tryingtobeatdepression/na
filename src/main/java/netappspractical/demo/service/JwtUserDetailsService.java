@@ -1,9 +1,15 @@
 package netappspractical.demo.service;
 
+import netappspractical.demo.domain.Privilege;
+import netappspractical.demo.domain.Role;
 import netappspractical.demo.domain._User;
 import netappspractical.demo.dto.UserDto;
+import netappspractical.demo.repository.RoleRepository;
 import netappspractical.demo.repository.UserRepository;
+import netappspractical.demo.util.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,17 +18,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("loadUserByUsername: " + email);
         _User user = userRepository.findByEmail(email);
         if(user == null) {
             throw new UsernameNotFoundException(String.format("User not found with email: %s", email));
@@ -30,22 +39,34 @@ public class JwtUserDetailsService implements UserDetailsService {
         return new User(
                 user.getEmail(),
                 user.getPassword(),
-                new ArrayList<>()
+                getAuthorities(user.getRoles())
         );
     }
-//
-//    /**
-//     * Create a new User
-//     *
-//     * @param userDto
-//     * @return
-//     */
-//    public _User create(UserDto userDto) {
-//        _User user = new _User();
-//        user.setEmail(userDto.getEmail());
-//        user.setName(userDto.getName());
-//        user.setPassword(userDto.getPassword());
-//        return this.userRepository.save(user);
-//    }
 
+    private Collection<? extends GrantedAuthority> getAuthorities(
+            Collection<Role> roles) {
+        return getGrantedAuthorities(getPrivileges(roles));
+    }
+
+    private List<String> getPrivileges(Collection<Role> roles) {
+        List<String> privileges = new ArrayList<>();
+        List<Privilege> collection = new ArrayList<>();
+        for (Role role : roles) {
+            privileges.add(role.getName()); // Adding all the roles
+            collection.addAll(role.getPrivileges()); // Adding all the privileges
+        }
+        for (Privilege item : collection) {
+            privileges.add(item.getName());
+            System.out.println("Privilege item.getName(): " + item.getName());
+        }
+        return privileges;
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (String privilege : privileges) {
+            authorities.add(new SimpleGrantedAuthority(privilege));
+        }
+        return authorities;
+    }
 }
