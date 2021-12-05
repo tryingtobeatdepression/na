@@ -2,6 +2,7 @@ package netappspractical.demo.controller;
 
 import netappspractical.demo.domain._User;
 import netappspractical.demo.dto.UserDto;
+import netappspractical.demo.repository.RoleRepository;
 import netappspractical.demo.repository.UserRepository;
 import netappspractical.demo.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,8 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping
     public ResponseEntity<?> getAll() {
@@ -34,6 +38,7 @@ public class UserController {
         _User user = new _User();
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
+        user.setRoles(Arrays.asList(this.roleRepository.findByName("ROLE_USER").get()));
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         this.userRepository.save(user);
         return "User created.";
