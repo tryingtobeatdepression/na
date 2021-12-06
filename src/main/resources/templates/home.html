@@ -12,6 +12,51 @@
     <div class="container">
         <h3><a class="link-danger" th:href="@{/register}">Register</a></h3>
         <h3><a class="link-danger" th:href="@{/login}">Login</a></h3>
+
+
+        <br/> <br/>
+        
+        <div>
+            <h5>User Info</h5>
+            <ul>
+                <button th:onclick="getUser()">Click me</button>
+                <li id="name"></li>
+                <li id="email"></li>
+            </ul>
+        </div>
+
     </div>
+
+
+    <script>
+        const url = "http://localhost:8080/users";
+
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        function getUser() {
+            const token = getToken();
+            if(!token)
+                return;
+            const authToken = "Bearer " + token;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': authToken,
+            };
+
+            const email = localStorage.getItem('email');
+
+            fetch(url, {
+				method: "GET",
+				credentials: "same-origin",
+				headers: headers,
+				body: email,
+			})
+                .then(res => res.json())
+                .then(data => console.log(data))
+                .catch(err => console.log(err));
+        }
+    </script>
 </body>
 </html>

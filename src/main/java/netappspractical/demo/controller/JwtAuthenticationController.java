@@ -1,20 +1,19 @@
 package netappspractical.demo.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import netappspractical.demo.config.JwtTokenUtil;
 import netappspractical.demo.model.JwtRequest;
 import netappspractical.demo.model.JwtResponse;
 import netappspractical.demo.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Using Spring AuthenticationManager we authenticate
@@ -41,12 +40,18 @@ public class JwtAuthenticationController {
      * @return
      * @throws Exception
      */
-    @PostMapping(name = "/auth",
-            produces = {"application/json", "application/xml"},
-            consumes = {"multipart/form-data"})
-    public ResponseEntity<?> createAuthenticationToken(JwtRequest authReq)
+    @PostMapping(value = "/login",
+            produces = {
+                    MediaType.APPLICATION_JSON_VALUE
+            },
+            consumes = {
+                    MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+                    MediaType.APPLICATION_XML_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE
+            }
+    )
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authReq)
             throws Exception {
-        System.out.println("Yo this is /auth !!");
         authenticate(authReq.getEmail(), authReq.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authReq.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
@@ -71,7 +76,7 @@ public class JwtAuthenticationController {
         } catch (DisabledException e) {
             // DisabledException Thrown if an authentication request is rejected
             // because the account is disabled.
-            // Makes no assertion as to whether or not the credentials were valid.
+            // Makes no assertion about credentials validity.
             throw new Exception("User Disabled. ", e);
         } catch (BadCredentialsException e) {
             throw new Exception("Invalid Credentials. ", e);

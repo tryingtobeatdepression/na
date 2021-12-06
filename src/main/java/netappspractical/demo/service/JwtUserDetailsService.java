@@ -48,6 +48,11 @@ public class JwtUserDetailsService implements UserDetailsService {
         return getGrantedAuthorities(getPrivileges(roles));
     }
 
+    /**
+     * TODO: Why this works this way??
+     * @param roles
+     * @return
+     */
     private List<String> getPrivileges(Collection<Role> roles) {
         List<String> privileges = new ArrayList<>();
         List<Privilege> collection = new ArrayList<>();
@@ -57,7 +62,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         }
         for (Privilege item : collection) {
             privileges.add(item.getName());
-            System.out.println("Privilege item.getName(): " + item.getName());
         }
         return privileges;
     }

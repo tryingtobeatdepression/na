@@ -6,6 +6,7 @@ import netappspractical.demo.repository.RoleRepository;
 import netappspractical.demo.repository.UserRepository;
 import netappspractical.demo.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -26,6 +28,13 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RoleRepository roleRepository;
+
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUser(@RequestBody String email) {
+        _User user = this.userRepository.findByEmail(email);
+        return ResponseEntity.ok(user);
+    }
 
     @GetMapping
     public ResponseEntity<?> getAll() {

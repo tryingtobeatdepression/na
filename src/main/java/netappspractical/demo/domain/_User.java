@@ -12,6 +12,7 @@ public class _User {
     private String name;
     private String email;
     private String password;
+    private String token;
 
     @Version
     private Long version;
@@ -24,6 +25,15 @@ public class _User {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles; // This gets saved in the "users_roles" table.
+
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public Collection<Role> getRoles() {
         return roles;
