@@ -51,7 +51,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createRoleIfNotFound("ROLE_USER", Arrays.asList(readPrivilege));
 
         // Create a new Admin
-        _User admin = this.userRepository.findByEmail("admin@mail.com");
+        Optional<_User> userObj = this.userRepository.findByEmail("admin@mail.com");
+        _User admin = userObj.get();
         if (admin == null) {
             admin = new _User();
             admin.setEmail("admin@mail.com");

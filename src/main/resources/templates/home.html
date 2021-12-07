@@ -11,19 +11,8 @@
     <h1>Hello! This is home page.</h1>
     <div class="container">
         <h3><a class="link-danger" th:href="@{/register}">Register</a></h3>
-        <h3><a class="link-danger" th:href="@{/login}">Login</a></h3>
-
-
-        <br/> <br/>
-        
-        <div>
-            <h5>User Info</h5>
-            <ul>
-                <button th:onclick="getUser()">Click me</button>
-                <li id="name"></li>
-                <li id="email"></li>
-            </ul>
-        </div>
+        <h3><a class="link-danger" th:href="@{/login}">Login</a></h3>   
+        <h3><a id="profile-page" class="link-danger" th:href="@{/user}">User Profile</a></h3>
 
     </div>
 
@@ -31,30 +20,47 @@
     <script>
         const url = "http://localhost:8080/users";
 
+		const profileLink = document.getElementById('profile-page');
+
+		// Display profile page
+		// profileLink.addEventListener("click", (e) => {
+		// 	e.preventDefault();
+		// 	// getUser();
+		// });
+
         function getToken() {
-            return localStorage.getItem('token');
+            return document.cookie;
         }
+
+        $.ajax(
+            
+        )
 
         function getUser() {
             const token = getToken();
             if(!token)
                 return;
-            const authToken = "Bearer " + token;
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': authToken,
-            };
+			// Add the word "Bearer" and delete "token="
+            const authToken = "Bearer " + token.slice(6);
+        
+			const headers = new Headers();
+			headers.append('Content-Type', 'application/json');
+			headers.append('Authorization', authToken);
 
-            const email = localStorage.getItem('email');
-
-            fetch(url, {
+			const request = new Request(url, {
 				method: "GET",
-				credentials: "same-origin",
 				headers: headers,
-				body: email,
-			})
+				redirect: 'manual',
+				credentials: 'include',
+                
+			});
+
+            fetch(request)
                 .then(res => res.json())
-                .then(data => console.log(data))
+                .then(data => {
+					console.log(data);
+					// window.location.href = "http://localhost:8080/user";
+				})
                 .catch(err => console.log(err));
         }
     </script>

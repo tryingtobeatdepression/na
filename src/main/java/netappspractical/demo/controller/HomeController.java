@@ -15,6 +15,11 @@ public class HomeController {
         return "home";
     }
 
+    @GetMapping("/user")
+    public String getUserProfile() {
+        return "user";
+    }
+
     @GetMapping("/login")
     public String login(Model model) {
         model.addAttribute("email", new String(""));

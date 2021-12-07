@@ -1,6 +1,9 @@
 package netappspractical.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.util.Collection;
 
 @Entity
@@ -17,7 +20,8 @@ public class _User {
     @Version
     private Long version;
 
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(

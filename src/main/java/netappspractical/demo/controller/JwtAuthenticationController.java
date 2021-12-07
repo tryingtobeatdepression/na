@@ -5,6 +5,8 @@ import netappspractical.demo.config.JwtTokenUtil;
 import netappspractical.demo.model.JwtRequest;
 import netappspractical.demo.model.JwtResponse;
 import netappspractical.demo.service.JwtUserDetailsService;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

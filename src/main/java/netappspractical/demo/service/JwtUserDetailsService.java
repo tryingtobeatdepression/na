@@ -8,8 +8,10 @@ import netappspractical.demo.repository.RoleRepository;
 import netappspractical.demo.repository.UserRepository;
 import netappspractical.demo.util.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,9 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import javax.transaction.Transactional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,9 +31,20 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
+    /**
+     * Why user @Transactional?
+     * https://stackoverflow.com/questions/3519059/
+     * hibernate-failed-to-lazily-initialize-a-collection-of-role-no-session-or-sessi
+     *
+     * @param email
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        _User user = userRepository.findByEmail(email);
+        Optional<_User> optionalUser = userRepository.findByEmail(email);
+        _User user = optionalUser.get();
         if(user == null) {
             throw new UsernameNotFoundException(String.format("User not found with email: %s", email));
         }

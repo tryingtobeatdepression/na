@@ -94,6 +94,8 @@
                 // Store token in localStorage
                 localStorage.setItem('email', email);
                 localStorage.setItem('token', data.jwtToken);
+                // Add to cookies
+                document.cookie = "token=" + data.jwtToken;
             })
 			.catch(function (err) {
 				console.log("ERROR!..", err);

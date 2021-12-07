@@ -1,5 +1,7 @@
 package netappspractical.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -28,7 +30,7 @@ public class Privilege implements Serializable{
     public Privilege() {
     }
 
-    // ✅
+    @JsonIgnore
     @ManyToMany(mappedBy = "privileges")
     private Collection<Role> roles;
 

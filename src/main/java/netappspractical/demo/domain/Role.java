@@ -1,5 +1,7 @@
 package netappspractical.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -26,9 +28,11 @@ public class Role implements Serializable{
 
     // The Role entity is the non-owning side of the
     // @ManyToMany relationship (_User <=> Role)
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Collection<_User> users;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "roles_privileges",
@@ -71,5 +75,15 @@ public class Role implements Serializable{
 
     public void setPrivileges(Collection<Privilege> privileges) {
         this.privileges = privileges;
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", users=" + users +
+                ", privileges=" + privileges +
+                '}';
     }
 }
